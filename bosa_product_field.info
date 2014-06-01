@@ -1,0 +1,7 @@
+name = Bosa product field
+description = Include a date field and stock field.
+package = BOSA
+core = 7.x
+version = "7.x-1.1"
+dependencies[] = field
+dependencies[] = date

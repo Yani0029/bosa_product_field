@@ -1,0 +1,110 @@
+<?php
+/*
+ * bosa_product_field.module file
+ * Include a date field and stock filed for bosa product.
+ * @author Yani Xu <yx@bellcom.dk>
+ */
+
+module_load_all();
+
+function bosa_product_field_field_info() {
+  return array(
+    'bosa_product_field' => array(
+      'label' => t('Bosa product date and stock'),
+      'description' => t('Product date and stock.'),
+      'default_widget' => 'bosa_product_field_widget',
+      'default_formatter' => 'bosa_product_field_formatter',
+    ),
+  );
+}
+
+function bosa_product_field_field_schema() {
+  $columns = array(
+    'product_date' => array(
+      'description' => 'Product date.',
+      'type' => 'datetime',
+      'mysql_type' => 'DATETIME',
+      'not null' => FALSE,
+      'default' => NULL,
+    ),
+
+    'product_stock' => array(
+      'description' => 'Product stock.',
+      'type' => 'int',
+      'not null' => FALSE,
+      'default' => 0,
+      'length' => 10,
+    ),
+
+  );
+
+  return array(
+    'columns' => $columns,
+    'indexes' => array(),
+  );
+}
+
+function bosa_product_field_field_widget_info() {
+  $widgets = array();
+
+  $widgets['bosa_product_field_widget'] = array(
+    'label' => t('Bosa Product field'),
+    'field types' => array('bosa_product_field',
+      '#type' => 'custom_field_type',
+    ),
+  );
+
+  return $widgets;
+}
+
+function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  $settings = $instance['widget']['settings'];
+  if ($instance['widget']['type'] == 'bosa_product_field_widget') {
+    $element += array(
+      '#type' => 'fieldset',
+    );
+    $item =& $items[$delta];
+    $element['product_date'] = array(
+      '#type' => 'date_popup',
+      '#size'  =>20,
+      '#title' => t('Date'),
+      '#default_value' => isset($item['product_date']) ? $item['product_date'] : '',
+      '#date_format' => "d/m/Y H:i",
+      '#date_year_range' => '-0:+2',
+    );
+    $element['product_stock'] = array(
+      '#type' => 'textfield',
+      '#size'  => 20,
+      '#title' => t('Lager '),
+      '#default_value' => isset($item['product_stock']) ? $item['product_stock'] : '',
+    );
+  }
+  return $element;
+}
+
+function bosa_product_field_field_formatter_info() {
+  return array(
+    'bosa_product_field_formatter' => array(
+      'label' => t('Default'),
+      'field types' => array('bosa_product_field'),
+    ),
+  );
+}
+function bosa_product_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'bosa_product_field_formatter':
+      foreach ($items as $delta => $item) {
+        $date =  $item['product_date'];
+        $date = date('d/m/Y - H:i',strtotime($date));
+        $element[$delta]['#markup'] = '<div><p><b> Product date - </b>' . $date . '</p><p><b> Lager : </b>' . $item['product_stock'] .'</p></div>';
+      }
+      break;
+  }
+  return $element;
+}
+function bosa_product_field_field_is_empty($item, $field) {
+  return empty($item['product_stock']);
+}
