@@ -27,15 +27,22 @@ function bosa_product_field_field_schema() {
       'not null' => FALSE,
       'default' => NULL,
     ),
-
     'product_stock' => array(
       'description' => 'Product stock.',
       'type' => 'int',
-      'not null' => FALSE,
+      'unsigned' => TRUE,
+      'not null' => TRUE,
       'default' => 0,
       'length' => 10,
     ),
-
+    'product_min_attendee' => array(
+      'description' => 'Product min attendee.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+      'length' => 10,
+    ),
   );
 
   return array(
@@ -61,6 +68,12 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
 
   $settings = $instance['widget']['settings'];
   if ($instance['widget']['type'] == 'bosa_product_field_widget') {
+    $users = entity_load('user');
+    $users_name = array();
+    foreach($users as $user) {
+      if ($user->uid)
+      $users_name[$user->uid] = $user->name;
+    }
     $element += array(
       '#type' => 'fieldset',
     );
@@ -76,8 +89,16 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
     $element['product_stock'] = array(
       '#type' => 'textfield',
       '#size'  => 20,
-      '#title' => t('Lager '),
-      '#default_value' => isset($item['product_stock']) ? $item['product_stock'] : '',
+      '#title' => t('Pladser '),
+      "#description" => t("'0' means unlimited"),
+      '#default_value' => isset($item['product_stock']) ? $item['product_stock'] : 0,
+    );
+    $element['product_min_attendee'] = array(
+      '#type' => 'textfield',
+      '#size'  => 20,
+      "#description" => t("'0' means unlimited"),
+      '#title' => t('Minimum deltagere'),
+      '#default_value' => isset($item['product_min_attendee']) ? $item['product_min_attendee'] : 0,
     );
   }
   return $element;
@@ -93,18 +114,28 @@ function bosa_product_field_field_formatter_info() {
 }
 function bosa_product_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
-
   switch ($display['type']) {
     case 'bosa_product_field_formatter':
       foreach ($items as $delta => $item) {
         $date =  $item['product_date'];
         $date = date('d/m/Y - H:i',strtotime($date));
-        $element[$delta]['#markup'] = '<div><p><b> Product date - </b>' . $date . '</p><p><b> Lager : </b>' . $item['product_stock'] .'</p></div>';
+        $element[$delta]['#markup'] = '
+        <div>
+        <span><a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $date . '</a></span></div>';
+      }
+      break;
+    case 'bosa_product_dato':
+      foreach ($items as $delta => $item) {
+        $date =  $item['product_date'];
+        $date = date('d/m/Y - H:i',strtotime($date));
+        $element[$delta]['#markup'] = '
+        <div><span> <a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $entity->title .'</a> </span><span><a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $entity->sku . '</a></span>
+        <span><a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $date . '</a></span></div>';
       }
       break;
   }
   return $element;
 }
 function bosa_product_field_field_is_empty($item, $field) {
-  return empty($item['product_stock']);
+  return (empty($item['product_date']) && empty($item['product_without_stock']));
 }
