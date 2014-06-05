@@ -43,6 +43,14 @@ function bosa_product_field_field_schema() {
       'default' => 0,
       'length' => 10,
     ),
+    'product_status' => array(
+      'description' => 'Product status.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 1,
+      'length' => 4,
+    ),
   );
 
   return array(
@@ -99,6 +107,13 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
       "#description" => t("'0' means unlimited"),
       '#title' => t('Minimum deltagere'),
       '#default_value' => isset($item['product_min_attendee']) ? $item['product_min_attendee'] : 0,
+    );
+    $element['product_status'] = array(
+      '#type' => 'checkbox',
+      '#size'  => 5,
+      "#description" => t("Deactive - not for sell, Active is default."),
+      '#title' => t('Product status'),
+      '#default_value' => isset($item['product_status']) ? $item['product_status'] : 1,
     );
   }
   return $element;
