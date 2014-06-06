@@ -20,6 +20,14 @@ function bosa_product_field_field_info() {
 
 function bosa_product_field_field_schema() {
   $columns = array(
+    'product_wdate' => array(
+      'description' => 'product_without_date.',
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+      'length' => 4,
+    ),
     'product_date' => array(
       'description' => 'Product date.',
       'type' => 'datetime',
@@ -98,8 +106,12 @@ function bosa_product_field_field_widget_info() {
 
 function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 
+  $product_id = isset($form_state['build_info']['args'][0]->product_id)
+                ? $form_state['build_info']['args'][0]->product_id : "";
   $css = '.product-items {border: 2px solid #e3e3e3;background-color:#f5f5f5;
-                   border-radius: 4px 4px;font-size: 14px;float:left;margin-right: 10px;}';
+                   border-radius: 4px 4px;font-size: 14px;float:left;margin-right: 10px;}
+          .product-seats {border: 2px solid #e3e3e3;background-color:#f5f5f5;
+                   border-radius: 4px 4px; width:200px; margin: 20px 0;}';
   drupal_add_css($css,$option['type'] = 'inline');
   $settings = $instance['widget']['settings'];
   if ($instance['widget']['type'] == 'bosa_product_field_widget') {
@@ -109,10 +121,17 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
       if ($user->uid)
       $users_name[$user->uid] = $user->name;
     }
+
     $element += array(
       '#type' => 'fieldset',
     );
     $item =& $items[$delta];
+    $element['product_wdate'] = array(
+      '#type' => 'checkbox',
+      '#size'  =>20,
+      '#title' => t('Uden Dato'),
+      '#default_value' => isset($item['product_wdate']) ? $item['product_wdate'] : 0,
+    );
     $element['product_date'] = array(
       '#type' => 'date_popup',
       '#size'  =>20,
@@ -121,6 +140,7 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
       '#date_format' => "d/m/Y H:i",
       '#date_year_range' => '-0:+2',
     );
+
     $element['product_stock'] = array(
       '#type' => 'textfield',
       '#size'  => 20,
@@ -128,6 +148,16 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
       "#description" => t("'0' means unlimited"),
       '#default_value' => isset($item['product_stock']) ? $item['product_stock'] : 0,
     );
+    if ($product_id) {
+
+      $seats_available = bosa_reserved_seats_available($product_id,$item['product_date'],$delta);
+      $element['product_seats_avalable'] = array(
+        '#type' => 'item',
+        '#prefix' => "<div class = 'product-seats'>",
+        '#markup'  => '<span>'. $seats_available . ' plader tilbage.',
+        '#suffix' => '</div>',
+      );
+    }
     $element['product_min_attendee'] = array(
       '#type' => 'textfield',
       '#size'  => 20,
@@ -208,5 +238,5 @@ function bosa_product_field_field_formatter_view($entity_type, $entity, $field, 
   return $element;
 }
 function bosa_product_field_field_is_empty($item, $field) {
-  return ((empty($item['product_date']) && empty($item['product_without_stock'])) || !empty($item['delete_product']));
+  return ((empty($item['product_date']) && empty($item['product_without_stock']) && empty($item['product_wdate'])) || !empty($item['delete_product']));
 }

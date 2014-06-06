@@ -5,3 +5,4 @@ core = 7.x
 version = "7.x-1.1"
 dependencies[] = field
 dependencies[] = date
+dependencies[] = bosa_reserved_seats
