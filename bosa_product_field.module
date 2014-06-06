@@ -59,30 +59,6 @@ function bosa_product_field_field_schema() {
       'default' => 1,
       'length' => 4,
     ),
-    'product_cancelled' => array(
-      'description' => 'Product cancelled.',
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-      'length' => 4,
-    ),
-    'product_cancelled_mailsent' => array(
-      'description' => 'Product cancelled mail sent.',
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-      'length' => 4,
-    ),
-    'product_refunded'=> array(
-      'description' => 'Product refunded.',
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-      'length' => 4,
-    ),
   );
 
   return array(
@@ -176,27 +152,6 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
       '#type' => 'checkbox',
       '#prefix' => "<div style = 'width: 50px;' class='product-items'>",
       '#title'  => t('Delete'),
-      '#suffix' => '</div>',
-    );
-    $element['product_cancelled'] = array(
-      '#type' => 'checkbox',
-      '#prefix' => "<div style = 'width: 100px;' class='product-items'>",
-      '#disabled' => TRUE,
-      '#title'  => t('cancelled'),
-      '#suffix' => '</div>',
-    );
-    $element['product_cancelled_mailsent'] = array(
-      '#type' => 'checkbox',
-      '#prefix' => "<div style = 'width: 200px;' class='product-items'>",
-      '#disabled' => TRUE,
-      '#title'  => t('Cancellation mail sent'),
-      '#suffix' => '</div>',
-    );
-    $element['product_refunded'] = array(
-      '#type' => 'checkbox',
-      '#prefix' => "<div style = 'width: 100px;' class='product-items'>",
-      '#disabled' => TRUE,
-      '#title'  => t('Refunded'),
       '#suffix' => '</div>',
     );
   }
