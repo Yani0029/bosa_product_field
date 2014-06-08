@@ -126,7 +126,7 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
     );
     if ($product_id) {
 
-      $seats_available = bosa_reserved_seats_available($product_id,$item['product_date'],$delta);
+      $seats_available = bosa_reserved_seats_available($product_id,$delta);
       $element['product_seats_avalable'] = array(
         '#type' => 'item',
         '#prefix' => "<div class = 'product-seats'>",
@@ -158,7 +158,7 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
   return $element;
 }
 function bosa_product_field_delete_elements($form, &$form_state) {
-  dpm($form_state);
+  //dpm($form_state);
 }
 function bosa_product_field_field_formatter_info() {
   return array(
@@ -174,10 +174,11 @@ function bosa_product_field_field_formatter_view($entity_type, $entity, $field, 
     case 'bosa_product_field_formatter':
       foreach ($items as $delta => $item) {
         $date =  $item['product_date'];
+        if($date)
         $date = date('d/m/Y - H:i',strtotime($date));
+        else $date = "Se deltagerlist";
         $element[$delta]['#markup'] = '
-        <div>
-        <span><a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $date . '</a></span></div>';
+        <a style ="text-decoration: underline;" href="/da/bosa/voucher/product/' . $entity->product_id .'/'. $delta . '">' . $date . '</a>';
       }
       break;
     case 'bosa_product_dato':
@@ -185,8 +186,7 @@ function bosa_product_field_field_formatter_view($entity_type, $entity, $field, 
         $date =  $item['product_date'];
         $date = date('d/m/Y - H:i',strtotime($date));
         $element[$delta]['#markup'] = '
-        <div><span> <a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $entity->title .'</a> </span><span><a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $entity->sku . '</a></span>
-        <span><a href="/bosa/voucher/bosa_product/'. $delta . '/' . $entity->product_id .'">' . $date . '</a></span></div>';
+        <div><span><a style ="text-decoration: underline;" href="/da/bosa/voucher/product/' . $entity->product_id .'/'. $delta . '">' . $date . '</a></span></div>';
       }
       break;
   }
