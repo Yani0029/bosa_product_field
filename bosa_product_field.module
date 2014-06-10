@@ -130,7 +130,7 @@ function bosa_product_field_field_widget_form(&$form, &$form_state, $field, $ins
       $element['product_seats_avalable'] = array(
         '#type' => 'item',
         '#prefix' => "<div class = 'product-seats'>",
-        '#markup'  => '<span>'. $seats_available . ' plader tilbage.',
+        '#markup'  => '<span>'. $seats_available . ' pladser tilbage.',
         '#suffix' => '</div>',
       );
     }
